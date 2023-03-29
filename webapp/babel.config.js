@@ -4,12 +4,7 @@
 const config = {
     presets: [
         ['@babel/preset-env', {
-            targets: {
-                chrome: 66,
-                firefox: 60,
-                edge: 42,
-                safari: 12,
-            },
+            targets: 'defaults', // > 0.5%, last 2 versions, Firefox ESR, not dead
             modules: 'auto',
             corejs: '3.29', // keep in sync w/ package.json core-js dependency
             debug: false,

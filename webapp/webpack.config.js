@@ -50,14 +50,19 @@ const config = {
             {
                 test: /\.(js|jsx|ts|tsx)$/,
                 exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        cacheDirectory: true,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            cacheDirectory: true,
 
-                        // Babel configuration is in babel.config.js because jest requires it to be there.
+                            // Babel configuration is in babel.config.js because jest requires it to be there.
+                        },
                     },
-                },
+                    {
+                        loader: 'ts-loader',
+                    },
+                ],
             },
             {
                 test: /\.(scss|css)$/,

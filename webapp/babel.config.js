@@ -10,8 +10,8 @@ const config = {
                 edge: 42,
                 safari: 12,
             },
-            modules: false,
-            corejs: 3,
+            modules: 'auto',
+            corejs: '3.29', // keep in sync w/ package.json core-js dependency
             debug: false,
             useBuiltIns: 'usage',
             shippedProposals: true,
@@ -19,18 +19,8 @@ const config = {
         ['@babel/preset-react', {
             useBuiltIns: true,
         }],
-        ['@babel/typescript', {
-            allExtensions: true,
-            isTSX: true,
-        }],
-        ['@emotion/babel-preset-css-prop'],
     ],
     plugins: [
-        '@babel/plugin-proposal-class-properties',
-        '@babel/plugin-syntax-dynamic-import',
-        '@babel/proposal-object-rest-spread',
-        '@babel/plugin-proposal-optional-chaining',
-        'babel-plugin-typescript-to-proptypes',
     ],
 };
 
@@ -41,6 +31,6 @@ config.env = {
         plugins: config.plugins,
     },
 };
-config.env.test.presets[0][1].modules = 'auto';
+config.env.test.presets[0][1] = {...config.env.test.presets[0][1], modules: 'auto'};
 
 module.exports = config;

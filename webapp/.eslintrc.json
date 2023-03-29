@@ -3,7 +3,8 @@
       "import/resolver": {
          "typescript": {
             "project": "./tsconfig.json"
-         }
+         },
+         "webpack": "webpack.config.js"
        },
       "react": {
          "version": "16.14.0"

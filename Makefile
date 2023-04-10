@@ -89,7 +89,8 @@ endif
 ## Ensures NPM dependencies are installed without having to run this all the time.
 webapp/node_modules: $(wildcard webapp/package.json)
 ifneq ($(HAS_WEBAPP),)
-	cd webapp && $(NPM) install
+	# --openssl-legacy-provider is needed in order to install the dependency: "@mattermost/webapp": "github:mattermost/mattermost-webapp#v6.3.10"
+	cd webapp && export NODE_OPTIONS=--openssl-legacy-provider && $(NPM) install
 	touch $@
 endif
 

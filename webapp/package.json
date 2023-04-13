@@ -19,6 +19,11 @@
     "test": "echo no webapp tests. install test packages when tests are written",
     "check-types": "tsc --noEmit"
   },
+  "overrides": {
+    "@mattermost/types": {
+      "typescript": "$typescript"
+    }
+  },
   "dependencies": {
     "@mattermost/webapp": "github:mattermost/mattermost-webapp#v6.3.10",
     "core-js": "^3.29.1",

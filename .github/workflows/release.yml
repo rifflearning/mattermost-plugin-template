@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build_and_release:
+    name: Build and release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go v1.17.x
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.17.x
+          cache: true
+
+      - name: Use Node.js v18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          registry-url: https://npm.pkg.github.com/
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Build and bundle the plugin
+        id: build
+        run: |
+          make dist
+          echo "BUNDLE_NAME=$(cd dist; ls *.tar.gz)" >> $GITHUB_OUTPUT
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_PKG_ACCESS_TOKEN }}
+          TERM: dumb
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Release ${{ github.ref_name }}
+          tag: ${{ github.ref }}
+          body: |
+            See the [CHANGELOG](https://github.com/rifflearning/mattermost-plugin-riff-core/blob/${{ github.ref_name }}/CHANGELOG.md) for details
+            ### Install the mattermost-plugin-riff-core plugin on a riffedu instance
+            1. Download the plugin release asset [${{ steps.build.outputs.BUNDLE_NAME }}](https://github.com/rifflearning/mattermost-plugin-riff-core/releases/download/${{ github.ref_name }}/${{ steps.build.outputs.BUNDLE_NAME }})
+            2. Go to the System Console | PLUGINS | Plugin Management page on the RiffEdu instance
+            3. If an older plugin is installed, remove it
+            4. Then upload the plugin file you downloaded
+            5. Enable the plugin
+          generateReleaseNotes: true
+          draft: false
+          prerelease: false
+          artifacts: dist/${{ steps.build.outputs.BUNDLE_NAME }}
+          artifactContentType: application/gzip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

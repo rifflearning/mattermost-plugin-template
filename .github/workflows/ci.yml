@@ -1,18 +1,63 @@
-name: ci
+# Continuous Integration Workflow to check pushes to master and pull requests:
+# - code style guidelines are followed (make check-style)
+# - tests pass (make test)
+# - code builds (make dist)
+name: CI
+
 on:
-  schedule:
-    - cron: "0 0 * * *"
+  pull_request:
   push:
     branches:
-      - master
-    tags:
-      - "^v.*"
-  pull_request:
-
-permissions:
-  contents: read
+      - main
 
 jobs:
-  plugin-ci:
-    uses: mattermost/actions-workflows/.github/workflows/plugin-ci.yml@main
-    secrets: inherit
+  ci:
+    name: Check style; build; test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go v1.17.x
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.17.x
+          cache: true
+
+      - name: Use Node.js v18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          registry-url: https://npm.pkg.github.com/
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Install webapp dependencies
+        run: make webapp/node_modules
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_PKG_ACCESS_TOKEN }}
+          TERM: dumb
+
+      - name: check style
+        run: make check-style
+        env:
+          TERM: dumb
+
+      - name: run tests
+        run: make test
+        env:
+          TERM: dumb
+
+      - name: build and bundle the plugin
+        id: build
+        run: |
+          make dist
+          echo "BUNDLE_NAME=$(cd dist; ls *.tar.gz)" >> $GITHUB_OUTPUT
+        env:
+          TERM: dumb
+
+      - name: Upload the built plugin as an artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.build.outputs.BUNDLE_NAME }}
+          path: dist/${{ steps.build.outputs.BUNDLE_NAME }}

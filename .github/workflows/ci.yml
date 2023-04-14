@@ -32,6 +32,9 @@ jobs:
           cache: npm
           cache-dependency-path: webapp/package-lock.json
 
+      - name: Install golangci v1.42.1
+        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.42.1
+
       - name: Install webapp dependencies
         run: make webapp/node_modules
         env:

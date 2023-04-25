@@ -263,6 +263,11 @@ ifneq ($(HAS_WEBAPP),)
 endif
 	rm -fr build/bin/
 
+## bump the version & update CHANGELOG.md using commit-and-tag-version pkg (in webapp) (cfg in .versionrc.json)
+.PHONY: release
+release:
+	webapp/node_modules/.bin/commit-and-tag-version
+
 # Help documentation à la https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 ## This help documentation
 help:
